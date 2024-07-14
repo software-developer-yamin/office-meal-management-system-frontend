@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,9 +18,14 @@ import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services";
 import { setCredentials } from "@/redux/authSlice";
 
-export default function LoginForm() {
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+interface LoginFormProps {
+  onLoginAttempt: (error: string | null) => void;
+}
+
+export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -33,12 +37,23 @@ export default function LoginForm() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: ({ data }) => {
-      dispatch(setCredentials(data))
-      navigate('/')
+      if (data.isBanned) {
+        onLoginAttempt("Your account has been banned. Please contact support.");
+      } else {
+        dispatch(setCredentials(data));
+        onLoginAttempt(null);
+        navigate("/");
+      }
+    },
+    onError: (error) => {
+      onLoginAttempt(
+        error.message || "An error occurred during login. Please try again."
+      );
     },
   });
 
   function onSubmit(values: z.infer<typeof authSchema>) {
+    onLoginAttempt(null);
     mutation.mutate(values);
   }
 
@@ -90,8 +105,9 @@ export default function LoginForm() {
         <Button
           type="submit"
           className="flex w-full justify-center rounded-md bg-primary py-2 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          disabled={mutation.isPending}
         >
-          Sign in
+          {mutation.isPending ? "Signing in..." : "Sign in"}
         </Button>
       </form>
     </Form>
