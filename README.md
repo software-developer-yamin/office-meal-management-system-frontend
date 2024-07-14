@@ -1,31 +1,80 @@
-# React + TypeScript + Vite
+# Office Meal Management System Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is the frontend for an Office Meal Management System, built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Table of Contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- User authentication (login, register, logout)
+- User management (create, read, update, delete users)
+- Meal management (create, read, update, delete meals)
+- Meal ordering system
+- Role-based access control (Admin and User roles)
 
-- Configure the top-level `parserOptions` property like this:
+## Prerequisites
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+Before you begin, ensure you have met the following requirements:
+
+- Node.js (v14.0.0 or later)
+- npm (v6.0.0 or later)
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/software-developer-yamin/office-meal-management-system-frontend.git
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
-# office-meal-management-system-frontend
+2. Navigate to the project directory:
+
+```bash
+cd office-meal-management-system-frontend
+```
+
+3. Install the dependencies:
+npm install
+
+## Running the Application
+
+To run the application in development mode:
+
+```bash
+npm run dev
+```
+
+This will start the development server. Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+
+To build the application for production:
+```bash
+npm run build
+```
+
+To preview the production build:
+```bash
+npm run preview
+```
+
+### Project Structure
+
+```bash
+src/
+├── components/      # Reusable React components
+├── pages/           # Page components
+├── services/        # API service functions
+├── store/           # Redux store setup and slices
+├── types/           # TypeScript type definitions
+├── utils/           # Utility functions
+├── App.tsx          # Main App component
+└── main.tsx         # Entry point
+```
