@@ -47,7 +47,7 @@ export type MealItem = {
   item: Item;
 }
 
-export interface MealOrder {
+export type MealOrder = {
   id: string
   userId: string
   mealId: string
