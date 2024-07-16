@@ -8,6 +8,8 @@ import Meals from "./pages/meals";
 import SaveMeals from "./pages/add-meal";
 import { Route, Routes } from "react-router-dom";
 import RequireAuth from "./components/require-auth";
+import MealSchedule from "./pages/meal-schedule";
+import MealOrder from "./pages/meal-order";
 
 function App() {
   return (
@@ -36,6 +38,24 @@ function App() {
           path="/add-meal"
           element={
             <RequireAuth component={<SaveMeals />} allowedRoles={["admin"]} />
+          }
+        />
+        <Route
+          path="/meal-orders"
+          element={
+            <RequireAuth
+              component={<MealOrder />}
+              allowedRoles={["admin", "user"]}
+            />
+          }
+        />
+        <Route
+          path="/meal-schedule"
+          element={
+            <RequireAuth
+              component={<MealSchedule />}
+              allowedRoles={["admin"]}
+            />
           }
         />
       </Route>
