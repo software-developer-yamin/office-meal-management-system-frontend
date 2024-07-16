@@ -78,3 +78,12 @@ src/
 ├── App.tsx          # Main App component
 └── main.tsx         # Entry point
 ```
+### Screenshots
+
+![Screenshot from 2024-07-17 01-54-00](https://github.com/user-attachments/assets/24338266-0e7c-4dde-9a95-40eea8263079)
+![Screenshot from 2024-07-17 01-53-50](https://github.com/user-attachments/assets/c28f978f-0b80-4a3f-a545-464a9edea43a)
+![Screenshot from 2024-07-17 01-53-31](https://github.com/user-attachments/assets/286dca5a-21ac-4a2c-a430-35f3b126ff9a)
+![Screenshot from 2024-07-17 01-53-19](https://github.com/user-attachments/assets/7d277095-8e62-4bdb-b748-4e1995579701)
+![Screenshot from 2024-07-17 01-52-43](https://github.com/user-attachments/assets/775315af-9c33-44a2-99fe-ea7f78401427)
+![Screenshot from 2024-07-17 01-52-27](https://github.com/user-attachments/assets/7279a103-91b6-49e3-91f6-e46457f8b1e3)
+![Screenshot from 2024-07-17 01-52-14](https://github.com/user-attachments/assets/a5110d84-b499-4b08-a907-cac55fea0b30)
