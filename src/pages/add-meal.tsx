@@ -73,7 +73,7 @@ export default function SaveMeals() {
 
   const onSubmit = useCallback(
     (values: MealFormValues) => {
-      if (values.itemIds.length > 3) {
+      if (values.itemIds.length >= 3) {
         createMealMutation.mutate(values);
         navigate("/meals");
       }

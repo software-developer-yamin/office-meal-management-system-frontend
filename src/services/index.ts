@@ -1,4 +1,4 @@
-import { Item, Meal, MealOrder, User } from "@/types";
+import { Item, Meal, MealOrder, MealSchedule, User } from "@/types";
 import api from "./api";
 
 export const register = (credentials: { email: string; password: string }) =>
@@ -27,7 +27,12 @@ export const createItem = (data: Omit<Item, "id">) =>
   api.post<Item>("/items", data).then((res) => res.data);
 
 export const updateItem = (data: Partial<Item>) =>
-  api.patch<Item>(`/items/${data.id}`, data).then((res) => res.data);
+  api
+    .patch<Item>(`/items/${data.id}`, {
+      name: data.name,
+      category: data.category,
+    })
+    .then((res) => res.data);
 
 export const deleteItem = (id: string) =>
   api.delete(`/items/${id}`).then((res) => res.data);
@@ -51,8 +56,33 @@ export const getMealOrders = () =>
 export const createMealOrder = (orderData: Partial<MealOrder>) =>
   api.post<MealOrder>("/meal-orders", orderData).then((res) => res.data);
 
-export const updateMealOrder = (id: string, orderData: Partial<MealOrder>) =>
-  api.put<MealOrder>(`/meal-orders/${id}`, orderData).then((res) => res.data);
+export const updateMealOrder = (data: Partial<MealOrder>) =>
+  api
+    .patch<MealOrder>(`/meal-orders/${data.id}`, {
+      userId: data.userId,
+      mealId: data.mealId,
+      date: data.date,
+    })
+    .then((res) => res.data);
 
 export const deleteMealOrder = (id: string) =>
   api.delete(`/meal-orders/${id}`).then((res) => res.data);
+
+export const getMealSchedules = () =>
+  api.get<MealSchedule[]>(`/meal-schedules`).then((res) => res.data);
+
+export const createMealSchedule = (
+  data: Omit<MealSchedule, "id" | "createdAt" | "updatedAt" | "meal" | "user">
+) => api.post<MealSchedule>("/meal-schedules", data).then((res) => res.data);
+
+export const updateMealSchedule = (data: Partial<MealSchedule>) =>
+  api
+    .patch<MealSchedule>(`/meal-schedules/${data.id}`, {
+      mealId: data.mealId,
+      startDate: data.startDate,
+      endDate: data.endDate,
+    })
+    .then((res) => res.data);
+
+export const deleteMealSchedule = (id: number) =>
+  api.delete(`/meal-schedules/${id}`).then((res) => res.data);
