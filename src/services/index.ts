@@ -18,12 +18,12 @@ export const getUser = (id: number) =>
 export const updateUser = (data: Partial<User>) =>
   api.patch<User>(`/users/${data.id}`, data).then((res) => res.data);
 
-export const deleteUser = (id: string) =>
+export const deleteUser = (id: number) =>
   api.delete(`/users/${id}`).then((res) => res.data);
 
 export const getItems = () => api.get<Item[]>("/items").then((res) => res.data);
 
-export const createItem = (data: Omit<Item, "id">) =>
+export const createItem = (data: Omit<Item, "id" | "createdAt" | "updatedAt">) =>
   api.post<Item>("/items", data).then((res) => res.data);
 
 export const updateItem = (data: Partial<Item>) =>
@@ -34,7 +34,7 @@ export const updateItem = (data: Partial<Item>) =>
     })
     .then((res) => res.data);
 
-export const deleteItem = (id: string) =>
+export const deleteItem = (id: number) =>
   api.delete(`/items/${id}`).then((res) => res.data);
 
 export const getMeals = () => api.get<Meal[]>("/meals").then((res) => res.data);
@@ -44,7 +44,7 @@ export const createMeal = (data: { dayOfWeek: string; itemIds: number[] }) =>
     .post("/meals", { ...data, dayOfWeek: data.dayOfWeek.toUpperCase() })
     .then((res) => res.data);
 
-export const updateMeal = (id: string, data: unknown) =>
+export const updateMeal = (id: number, data: unknown) =>
   api.put(`/meals/${id}`, data).then((res) => res.data);
 
 export const deleteMeal = (id: number) =>

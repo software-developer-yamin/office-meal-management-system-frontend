@@ -38,7 +38,7 @@ export default function Items() {
   }, []);
 
   const handleDelete = useCallback(
-    (id: string) => {
+    (id: number) => {
       deleteMutation.mutate(id);
     },
     [deleteMutation]
