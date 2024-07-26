@@ -10,6 +10,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   createMealSchedule,
   getMealSchedules,
@@ -27,13 +29,14 @@ import {
   parseISO,
   isSameDay,
 } from "date-fns";
-import { MealSchedule, Meal, DayOfWeek } from "@/types";
+import { Meal, DayOfWeek } from "@/types";
 
 export default function MealOrder() {
   const [selectedDate, setSelectedDate] = useState(() =>
     formatISO(startOfDay(new Date()))
   );
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Queries
   const { data: meals = [], isLoading: isLoadingMeals } = useQuery<Meal[]>({
@@ -41,9 +44,7 @@ export default function MealOrder() {
     queryFn: getMeals,
   });
 
-  const { data: mealSchedules = [], isLoading: isLoadingSchedules } = useQuery<
-    MealSchedule[]
-  >({
+  const { data: mealSchedules = [], isLoading: isLoadingSchedules } = useQuery({
     queryKey: ["mealSchedules"],
     queryFn: getMealSchedules,
   });
@@ -53,24 +54,57 @@ export default function MealOrder() {
     mutationFn: createMealSchedule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mealSchedules"] });
+      toast({
+        title: "Success",
+        description: "Meal schedule created successfully.",
+      });
     },
-    onError: () => {},
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create meal schedule. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Create error:", error);
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: updateMealSchedule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mealSchedules"] });
+      toast({
+        title: "Success",
+        description: "Meal schedule updated successfully.",
+      });
     },
-    onError: () => {},
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update meal schedule. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Update error:", error);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteMealSchedule,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mealSchedules"] });
+      toast({
+        title: "Success",
+        description: "Meal schedule deleted successfully.",
+      });
     },
-    onError: () => {},
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete meal schedule. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Delete error:", error);
+    },
   });
 
   // Memoized values
@@ -107,6 +141,11 @@ export default function MealOrder() {
     const selectedDateObj = parseISO(selectedDate);
 
     if (isBefore(selectedDateObj, today)) {
+      toast({
+        title: "Error",
+        description: "Cannot modify past dates.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -163,21 +202,37 @@ export default function MealOrder() {
       await Promise.all(
         schedules.map((schedule) => createMutation.mutateAsync(schedule))
       );
+      toast({
+        title: "Success",
+        description: "Monthly meal schedule created successfully.",
+      });
     } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          "Failed to schedule meals for the month. Please try again.",
+        variant: "destructive",
+      });
       console.error("Error scheduling month:", error);
     }
   };
 
-  if (isLoadingMeals || isLoadingSchedules) {
-    return <div>Loading...</div>;
-  }
+  if (isLoadingMeals || isLoadingSchedules)
+    return <LoadingSpinner className="w-12 h-12" />;
 
   return (
     <main className="flex-1">
       <div className="max-w-4xl mx-auto p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Weekly Meal Schedule</h1>
-          <Button variant="outline" onClick={handleScheduleMonth}>
+          <Button
+            variant="outline"
+            onClick={handleScheduleMonth}
+            disabled={createMutation.isPending}
+          >
+            {createMutation.isPending ? (
+              <LoadingSpinner className="w-4 h-4 mr-2" />
+            ) : null}
             Schedule Meals for Month
           </Button>
         </div>
@@ -208,6 +263,11 @@ export default function MealOrder() {
                 <Select
                   value={mealPlan[selectedDate]?.toString() ?? "No Meal"}
                   onValueChange={handleMealChange}
+                  disabled={
+                    updateMutation.isPending ||
+                    deleteMutation.isPending ||
+                    createMutation.isPending
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />

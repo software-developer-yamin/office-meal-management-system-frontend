@@ -16,12 +16,20 @@ export const getUser = (id: number) =>
   api.get<User>(`/users/${id}`).then((res) => res.data);
 
 export const updateUser = (data: Partial<User>) =>
-  api.patch<User>(`/users/${data.id}`, data).then((res) => res.data);
+  api.patch<User>(`/users/${data.id}`, {
+    name: data.name ?? null,
+    email: data.email,
+    role: data.role,
+    isBanned: data.isBanned,
+    isEmailVerified: data.isEmailVerified,
+    password: data.password
+
+  }).then((res) => res.data);
 
 export const deleteUser = (id: number) =>
   api.delete(`/users/${id}`).then((res) => res.data);
 
-export const getItems = () => api.get<Item[]>("/items").then((res) => res.data);
+export const getItems = () => api.get<Item[]>("/items?limit=20").then((res) => res.data);
 
 export const createItem = (data: Omit<Item, "id" | "createdAt" | "updatedAt">) =>
   api.post<Item>("/items", data).then((res) => res.data);

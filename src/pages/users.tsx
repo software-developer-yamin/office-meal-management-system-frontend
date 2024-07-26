@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "@/services";
 import { useState } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type User = {
   id: number;
@@ -30,7 +31,7 @@ type ModalInfo = {
 };
 
 export default function Users() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: getUsers,
   });
@@ -115,10 +116,17 @@ export default function Users() {
     });
   };
 
-  if (isLoading) {
+  if (isLoading) return <LoadingSpinner />;
+
+  if (isError) {
     return (
       <main className="flex items-center justify-center h-[85vh] w-full">
-        <LoadingSpinner />
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            An error occurred while fetching users. Please try again later.
+          </AlertDescription>
+        </Alert>
       </main>
     );
   }

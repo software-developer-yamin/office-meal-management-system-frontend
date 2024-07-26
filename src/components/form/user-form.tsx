@@ -31,6 +31,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser, updateUser } from "@/services";
 import React, { useEffect, useCallback } from "react";
 import { User } from "@/types";
+import { useToast } from "../ui/use-toast";
 
 type UserFormProps = {
   modalInfo: { isOpen: boolean; data: User | null; type: "add" | "edit" };
@@ -45,6 +46,7 @@ type UserFormProps = {
 
 export default function UserForm({ modalInfo, setModalInfo }: UserFormProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -83,15 +85,40 @@ export default function UserForm({ modalInfo, setModalInfo }: UserFormProps) {
 
   const addMutation = useMutation({
     mutationFn: createUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "User Added",
+        description: `User ${data.name} has been successfully added.`,
+      });
+      setModalInfo((prev) => ({ ...prev, isOpen: false, type: "add" }));
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message ?? "Failed to add user. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: updateUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "User Updated",
+        description: `User ${data.name} has been successfully updated.`,
+      });
+      setModalInfo((prev) => ({ ...prev, isOpen: false, type: "add" }));
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description:
+          error.message ?? "Failed to update user. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -213,7 +240,11 @@ export default function UserForm({ modalInfo, setModalInfo }: UserFormProps) {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={addMutation.isPending || updateMutation.isPending}
+            >
               {modalInfo.type === "edit" ? "Update" : "Add"}
             </Button>
           </form>
