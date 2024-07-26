@@ -10,6 +10,7 @@ import { Route, Routes } from "react-router-dom";
 import RequireAuth from "./components/require-auth";
 import MealSchedule from "./pages/meal-schedule";
 import MealOrder from "./pages/meal-order";
+import AccessDenied from "./pages/access-denied";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
       </Route>
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
+      <Route path="/access-denied" element={<AccessDenied />} />
     </Routes>
   );
 }

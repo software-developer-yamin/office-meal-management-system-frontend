@@ -31,6 +31,13 @@ export default function SignIn() {
 
         <LoginForm onLoginAttempt={handleLoginAttempt} />
 
+        <Alert variant="default">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Admin</AlertTitle>
+          <AlertDescription>email: user@example.com</AlertDescription>
+          <AlertDescription>password: password123</AlertDescription>
+        </Alert>
+
         {banError && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
