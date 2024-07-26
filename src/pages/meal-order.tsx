@@ -30,6 +30,7 @@ import {
   isSameDay,
 } from "date-fns";
 import { Meal, DayOfWeek } from "@/types";
+import { useAppSelector } from "@/redux/hook";
 
 export default function MealOrder() {
   const [selectedDate, setSelectedDate] = useState(() =>
@@ -37,6 +38,7 @@ export default function MealOrder() {
   );
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const userId = useAppSelector(({ auth }) => auth.user?.id);
 
   // Queries
   const { data: meals = [], isLoading: isLoadingMeals } = useQuery<Meal[]>({
@@ -46,7 +48,7 @@ export default function MealOrder() {
 
   const { data: mealSchedules = [], isLoading: isLoadingSchedules } = useQuery({
     queryKey: ["mealSchedules"],
-    queryFn: getMealSchedules,
+    queryFn: () => getMealSchedules(userId),
   });
 
   // Mutations
