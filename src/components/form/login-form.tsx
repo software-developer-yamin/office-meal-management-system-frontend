@@ -17,6 +17,7 @@ import { useAppDispatch } from "@/redux/hook";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services";
 import { setCredentials } from "@/redux/authSlice";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LoginFormProps {
   onLoginAttempt: (error: string | null) => void;
@@ -25,6 +26,7 @@ interface LoginFormProps {
 export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -39,16 +41,30 @@ export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
     onSuccess: ({ data }) => {
       if (data.isBanned) {
         onLoginAttempt("Your account has been banned. Please contact support.");
+        toast({
+          title: "Access Denied",
+          description: "Your account has been banned. Please contact support.",
+          variant: "destructive",
+        });
       } else {
         dispatch(setCredentials(data));
         onLoginAttempt(null);
+        toast({
+          title: "Login Successful",
+          description: "You have been successfully logged in.",
+        });
         navigate("/");
       }
     },
     onError: (error) => {
-      onLoginAttempt(
-        error.message || "An error occurred during login. Please try again."
-      );
+      const errorMessage =
+        error.message || "An error occurred during login. Please try again.";
+      onLoginAttempt(errorMessage);
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 

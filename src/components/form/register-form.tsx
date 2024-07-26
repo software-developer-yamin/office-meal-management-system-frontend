@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,10 +17,13 @@ import { register } from "@/services";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/redux/hook";
 import { setCredentials } from "@/redux/authSlice";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function RegisterForm() {
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
     defaultValues: {
@@ -33,8 +35,19 @@ export default function RegisterForm() {
   const mutation = useMutation({
     mutationFn: register,
     onSuccess: ({ data }) => {
-      dispatch(setCredentials(data))
-      navigate('/')
+      dispatch(setCredentials(data));
+      toast({
+        title: "Registration successful",
+        description: "You have been successfully registered.",
+      });
+      navigate('/');
+    },
+    onError: (error) => {
+      toast({
+        title: "Registration failed",
+        description: error.message || "An error occurred during registration.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -76,7 +89,7 @@ export default function RegisterForm() {
                 <Input
                   id="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   className="block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 placeholder-muted-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
                   placeholder="Password"
@@ -90,8 +103,9 @@ export default function RegisterForm() {
         <Button
           type="submit"
           className="flex w-full justify-center rounded-md bg-primary py-2 px-4 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          disabled={mutation.isPending}
         >
-          Sign Up
+          {mutation.isPending ? "Signing Up..." : "Sign Up"}
         </Button>
       </form>
     </Form>

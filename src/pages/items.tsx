@@ -4,9 +4,15 @@ import ItemForm from "@/components/form/item-form";
 import { Item } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteItem, getItems } from "@/services";
+import { useToast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TriangleIcon } from "lucide-react";
 
 export default function Items() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const [modalInfo, setModalInfo] = useState<{
     isOpen: boolean;
     data: Item | null;
@@ -17,7 +23,7 @@ export default function Items() {
     type: "add",
   });
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["items"],
     queryFn: getItems,
   });
@@ -26,6 +32,17 @@ export default function Items() {
     mutationFn: deleteItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
+      toast({
+        title: "Item deleted",
+        description: "The item has been successfully deleted.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete item: ${error.message}`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -46,8 +63,19 @@ export default function Items() {
 
   const categories = ["PROTEIN", "STARCH", "VEGETABLE", "OTHER"];
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>An error occurred</div>;
+  if (isLoading) return <LoadingSpinner />;
+
+  if (isError) {
+    return (
+      <Alert variant="destructive">
+        <TriangleIcon className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          {error instanceof Error ? error.message : "An unknown error occurred"}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <main className="flex-1">
@@ -95,6 +123,13 @@ export default function Items() {
                         </div>
                       </div>
                     ))}
+                {data &&
+                  data.filter((item) => item.category === category).length ===
+                    0 && (
+                    <p className="text-gray-500 text-sm">
+                      No items in this category
+                    </p>
+                  )}
               </div>
             </article>
           ))}

@@ -1,20 +1,28 @@
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItems, createMeal } from "@/services";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useState, useCallback } from "react";
-import { Item } from "@/types"; // Assuming you have a types file
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Item } from "@/types";
 
 const mealSchema = z.object({
   dayOfWeek: z.string(),
-  itemIds: z.array(z.number()),
+  itemIds: z.array(z.number()).min(3, "Please select at least 3 items"),
 });
 
 type MealFormValues = z.infer<typeof mealSchema>;
@@ -32,11 +40,12 @@ export default function SaveMeals() {
   const queryClient = useQueryClient();
   const [selectedDay, setSelectedDay] = useState<MealDay>(mealDays[0]);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const {
     data: itemsData,
-    isPending,
-    isError,
+    isPending: isItemsLoading,
+    isError: isItemsError,
   } = useQuery({
     queryKey: ["items"],
     queryFn: getItems,
@@ -46,11 +55,19 @@ export default function SaveMeals() {
     mutationFn: createMeal,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["meals"] });
-      form.reset(); // Reset form after successful submission
+      toast({
+        title: "Meal created",
+        description: "Your meal has been successfully created.",
+      });
+      navigate("/meals");
     },
     onError: (error) => {
       console.error("Failed to create meal:", error);
-      // TODO: Implement proper error handling (e.g., show error message to user)
+      toast({
+        title: "Error",
+        description: "Failed to create the meal. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -73,19 +90,20 @@ export default function SaveMeals() {
 
   const onSubmit = useCallback(
     (values: MealFormValues) => {
-      if (values.itemIds.length >= 3) {
-        createMealMutation.mutate(values);
-        navigate("/meals");
-      }
+      createMealMutation.mutate(values);
     },
-    [createMealMutation, navigate]
+    [createMealMutation]
   );
 
-  if (isPending) return <div className="text-center py-8">Loading...</div>;
-  if (isError)
+  if (isItemsLoading) return <LoadingSpinner className="w-12 h-12" />;
+
+  if (isItemsError) {
     return (
-      <div className="text-center py-8 text-red-500">Error loading items</div>
+      <div className="text-center py-8 text-red-500">
+        Error loading items. Please try again later.
+      </div>
     );
+  }
 
   return (
     <main className="flex-1">
@@ -142,6 +160,7 @@ export default function SaveMeals() {
                         )}
                       />
                     ))}
+                    <FormMessage />
                   </CardContent>
                   <CardFooter>
                     <Button
@@ -149,7 +168,14 @@ export default function SaveMeals() {
                       className="ml-auto"
                       disabled={createMealMutation.isPending}
                     >
-                      {createMealMutation.isPending ? "Saving..." : "Save Meal"}
+                      {createMealMutation.isPending ? (
+                        <>
+                          <LoadingSpinner className="mr-2 h-4 w-4" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Meal"
+                      )}
                     </Button>
                   </CardFooter>
                 </form>

@@ -30,6 +30,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createItem, updateItem } from "@/services";
 import React, { useEffect, useCallback } from "react";
 import { Item } from "@/types";
+import { useToast } from "../ui/use-toast";
 
 type ModalFormProps = {
   modalInfo: { isOpen: boolean; data: Item | null; type: "add" | "edit" };
@@ -44,6 +45,7 @@ type ModalFormProps = {
 
 export default function ModalForm({ modalInfo, setModalInfo }: ModalFormProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof itemSchema>>({
     resolver: zodResolver(itemSchema),
@@ -75,6 +77,18 @@ export default function ModalForm({ modalInfo, setModalInfo }: ModalFormProps) {
     mutationFn: createItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
+      toast({
+        title: "Item added",
+        description: "The new item has been successfully added.",
+      });
+      setModalInfo((prev) => ({ ...prev, isOpen: false, type: "add" }));
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to add item:${error.message ?? "Unknown error"}`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -82,6 +96,18 @@ export default function ModalForm({ modalInfo, setModalInfo }: ModalFormProps) {
     mutationFn: updateItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
+      toast({
+        title: "Item updated",
+        description: "The item has been successfully updated.",
+      });
+      setModalInfo((prev) => ({ ...prev, isOpen: false, type: "add" }));
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update item: ${error.message ?? "Unknown error"}`,
+        variant: "destructive",
+      });
     },
   });
 
@@ -156,7 +182,11 @@ export default function ModalForm({ modalInfo, setModalInfo }: ModalFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={addMutation.isPending || updateMutation.isPending}
+            >
               {modalInfo.type === "edit" ? "Update" : "Add"}
             </Button>
           </form>
