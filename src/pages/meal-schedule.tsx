@@ -92,7 +92,7 @@ export default function MealSchedule() {
     error,
   } = useQuery({
     queryKey: ["mealSchedules"],
-    queryFn: getMealSchedules,
+    queryFn: () => getMealSchedules(),
   });
 
   if (isLoading) return <LoadingSkeleton />;
