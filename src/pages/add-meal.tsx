@@ -95,7 +95,7 @@ export default function SaveMeals() {
     [createMealMutation]
   );
 
-  if (isItemsLoading) return <LoadingSpinner className="w-12 h-12" />;
+  if (isItemsLoading) return <LoadingSpinner />;
 
   if (isItemsError) {
     return (

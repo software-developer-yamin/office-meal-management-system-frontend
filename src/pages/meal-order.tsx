@@ -220,7 +220,7 @@ export default function MealOrder() {
   };
 
   if (isLoadingMeals || isLoadingSchedules)
-    return <LoadingSpinner className="w-12 h-12" />;
+    return <LoadingSpinner />;
 
   return (
     <main className="flex-1">

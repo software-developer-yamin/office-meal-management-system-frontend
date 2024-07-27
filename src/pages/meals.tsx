@@ -22,7 +22,7 @@ export default function Meals() {
 
   const {
     data: mealsData,
-    isPending,
+    isLoading,
     isError,
   } = useQuery({
     queryKey: ["meals"],
@@ -79,7 +79,7 @@ export default function Meals() {
     []
   );
 
-  if (isPending) return <LoadingSpinner className="w-12 h-12" />;
+  if (isLoading) return <LoadingSpinner />;
 
   if (isError) {
     return (
