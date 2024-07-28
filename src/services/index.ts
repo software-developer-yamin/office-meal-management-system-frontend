@@ -1,11 +1,24 @@
 import { Item, Meal, MealOrder, MealSchedule, User } from "@/types";
 import api from "./api";
+import axios from "axios";
 
 export const register = (credentials: { email: string; password: string }) =>
-  api.post("/auth/register", credentials);
+  axios.post(
+    `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
+    credentials,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(res => res.data);
 
 export const login = (credentials: { email: string; password: string }) =>
-  api.post("/auth/login", credentials);
+  axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, credentials, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.data);
 
 export const createUser = (data: Omit<User, "id" | "isEmailVerified">) =>
   api.post<User>("/users", data).then((res) => res.data);

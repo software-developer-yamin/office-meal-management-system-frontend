@@ -41,14 +41,8 @@ export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
     onSuccess: ({ data }) => {
       if (data.isBanned) {
         onLoginAttempt("Your account has been banned. Please contact support.");
-        toast({
-          title: "Access Denied",
-          description: "Your account has been banned. Please contact support.",
-          variant: "destructive",
-        });
       } else {
         dispatch(setCredentials(data));
-        onLoginAttempt(null);
         toast({
           title: "Login Successful",
           description: "You have been successfully logged in.",
@@ -59,7 +53,6 @@ export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
     onError: (error) => {
       const errorMessage =
         error.message || "An error occurred during login. Please try again.";
-      onLoginAttempt(errorMessage);
       toast({
         title: "Login Failed",
         description: errorMessage,
