@@ -38,8 +38,8 @@ export default function LoginForm({ onLoginAttempt }: LoginFormProps) {
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: ({ data }) => {
-      if (data.isBanned) {
+    onSuccess: (data) => {
+      if (data.user.isBanned) {
         onLoginAttempt("Your account has been banned. Please contact support.");
       } else {
         dispatch(setCredentials(data));
